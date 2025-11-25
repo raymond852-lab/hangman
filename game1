@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daddy's Hangman</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+  /* --- CSS STYLES --- */
+  :root {
+    --primary: #673AB7;
+    --accent: #FFC107;
+    --bg-grad: linear-gradient(135deg, #EDE7F6 0%, #D1C4E9 100%);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  body {
+    margin: 0; background: var(--bg-grad); font-family: var(--font);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; text-align: center; color: #4527A0;
+    overflow-x: hidden; user-select: none;
+  }
+
+  /* Screens */
+  .screen { display: none; width: 95%; max-width: 600px; flex-direction: column; align-items: center; padding: 10px; box-sizing: border-box; }
+  .active { display: flex; }
+
+  /* Teacher Setup Input */
+  textarea {
+    width: 100%; height: 120px; padding: 10px; font-size: 1.1rem;
+    border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 15px;
+  }
+
+  /* Game Elements */
+  #hangmanCanvas {
+    background: white; border-radius: 10px; border: 3px solid #4527A0;
+    margin: 10px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  #wordDisplay {
+    font-size: 2rem; letter-spacing: 5px; font-weight: bold;
+    margin: 10px 0 20px 0; font-family: monospace; color: #311B92;
+    min-height: 2.5rem; word-wrap: break-word; line-height: 1.5;
+  }
+
+  /* Keyboard */
+  .keyboard {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; width: 100%;
+  }
+  .key {
+    width: 12vw; height: 12vw; max-width: 45px; max-height: 45px;
+    background: white; border: 2px solid var(--primary); border-radius: 8px;
+    font-size: 1.2rem; font-weight: bold; color: var(--primary);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .key:active { transform: scale(0.9); }
+  .key.correct { background: #4CAF50; color: white; border-color: #388E3C; opacity: 0.5; pointer-events: none; }
+  .key.wrong { background: #E57373; color: white; border-color: #D32F2F; opacity: 0.5; pointer-events: none; }
+
+  /* Controls */
+  .controls { display: flex; gap: 10px; margin-top: 15px; }
+  
+  button {
+    border: none; border-radius: 50px; cursor: pointer; font-weight: bold;
+    padding: 10px 20px; font-size: 1rem; transition: transform 0.1s;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2); color: white;
+  }
+  button:active { transform: scale(0.95); }
+  .btn-primary { background: var(--primary); }
+  .btn-accent { background: var(--accent); color: #333; }
+  .btn-text { background: none; color: #4527A0; box-shadow: none; text-decoration: underline; margin-top: 10px;}
+
+  /* Feedback Overlay */
+  #feedback {
+    font-size: 1.5rem; font-weight: bold; margin: 5px; height: 2rem;
+  }
+
+  canvas.confetti { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 999; }
+</style>
+</head>
+<body>
+
+<div id="setupScreen" class="screen active">
+  <h1>Hangman Setup 🤠</h1>
+  <p>Enter words to guess (one per line):</p>
+  <textarea id="wordListInput" placeholder="Apple&#10;Elephant&#10;Ice Cream"></textarea>
+  <button class="btn-primary" style="font-size:1.5rem; padding:15px 40px;" onclick="startGame()">Start Game ▶</button>
+  <button class="btn-text" onclick="clearStorage()">Clear Saved List</button>
+</div>
+
+<div id="gameScreen" class="screen">
+  <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+    <span>Word <b id="currentNum">1</b>/<span id="totalNum">0</span></span>
+    <button class="btn-accent" style="padding:5px 15px; font-size:0.9rem;" onclick="speakCurrent()">🔊 Hint</button>
+  </div>
+
+  <canvas id="hangmanCanvas" width="200" height="150"></canvas>
+  
+  <div id="feedback"></div>
+  <div id="wordDisplay">_ _ _ _ _</div>
+
+  <div class="keyboard" id="keyboard"></div>
+
+  <div class="controls">
+    <button class="btn-primary" onclick="skipWord()">Next Word ➡</button>
+    <button class="btn-text" onclick="editList()">Edit List</button>
+  </div>
+</div>
+
+<div id="winScreen" class="screen">
+  <h1 style="font-size:4rem">🏆</h1>
+  <h1>YOU WIN!</h1>
+  <button class="btn-primary" onclick="editList()">Play Again</button>
+</div>
+
+<canvas id="confetti" class="confetti"></canvas>
+<audio id="snd_win" src="https://www.soundjay.com/misc/success-1.mp3"></audio>
+<audio id="snd_clap" src="https://www.soundjay.com/human/applause-01.mp3"></audio>
+<audio id="snd_click" src="https://www.soundjay.com/button/button-30.mp3"></audio>
+
+<script>
+  // --- STATE ---
+  let words = [];
+  let currentIndex = 0;
+  let currentWord = "";
+  let guessedLetters = [];
+  let mistakes = 0;
+  const maxMistakes = 6;
+
+  // --- INIT ---
+  window.onload = function() {
+    const saved = localStorage.getItem('hangmanWords');
+    if (saved) document.getElementById('wordListInput').value = saved;
+  };
+
+  function startGame() {
+    const rawText = document.getElementById('wordListInput').value;
+    words = rawText.split('\n').map(w => w.trim()).filter(w => w.length > 0);
+    if (words.length === 0) return alert("Please type some words!");
+    
+    localStorage.setItem('hangmanWords', rawText);
+    
+    currentIndex = 0;
+    document.getElementById('totalNum').innerText = words.length;
+    showScreen('gameScreen');
+    loadWord();
+  }
+
+  function loadWord() {
+    currentWord = words[currentIndex].toUpperCase();
+    guessedLetters = [];
+    mistakes = 0;
+    
+    document.getElementById('currentNum').innerText = currentIndex + 1;
+    document.getElementById('feedback').innerText = "";
+    document.getElementById('feedback').style.color = "inherit";
+
+    // Create Keyboard
+    const kb = document.getElementById('keyboard');
+    kb.innerHTML = '';
+    for (let i = 65; i <= 90; i++) {
+      const char = String.fromCharCode(i);
+      const btn = document.createElement('div');
+      btn.className = 'key';
+      btn.innerText = char;
+      btn.onclick = () => handleGuess(char, btn);
+      kb.appendChild(btn);
+    }
+
+    drawHangman();
+    updateWordDisplay();
+  }
+
+  function handleGuess(letter, btnElement) {
+    if (guessedLetters.includes(letter) || mistakes >= maxMistakes) return;
+    
+    guessedLetters.push(letter);
+    document.getElementById('snd_click').play();
+
+    if (currentWord.includes(letter)) {
+      btnElement.classList.add('correct');
+      checkWin();
+    } else {
+      btnElement.classList.add('wrong');
+      mistakes++;
+      drawHangman();
+      checkLoss();
+    }
+    updateWordDisplay();
+  }
+
+  function updateWordDisplay() {
+    // Show letters if guessed, or if they are special chars (spaces, hyphens)
+    const display = currentWord.split('').map(char => {
+      if (guessedLetters.includes(char) || !/[A-Z]/.test(char)) return char;
+      return "_";
+    }).join(" ");
+    document.getElementById('wordDisplay').innerText = display;
+  }
+
+  function drawHangman() {
+    const canvas = document.getElementById('hangmanCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    if (mistakes === 0) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#4527A0";
+    ctx.beginPath();
+
+    // Drawing steps
+    switch(mistakes) {
+      case 0: // Base
+        ctx.moveTo(10, 140); ctx.lineTo(190, 140);
+        ctx.moveTo(50, 140); ctx.lineTo(50, 10);
+        ctx.lineTo(120, 10); ctx.lineTo(120, 30);
+        break;
+      case 1: // Head
+        ctx.arc(120, 45, 15, 0, Math.PI * 2);
+        break;
+      case 2: // Body
+        ctx.moveTo(120, 60); ctx.lineTo(120, 100);
+        break;
+      case 3: // Left Arm
+        ctx.moveTo(120, 70); ctx.lineTo(90, 85);
+        break;
+      case 4: // Right Arm
+        ctx.moveTo(120, 70); ctx.lineTo(150, 85);
+        break;
+      case 5: // Left Leg
+        ctx.moveTo(120, 100); ctx.lineTo(95, 130);
+        break;
+      case 6: // Right Leg
+        ctx.moveTo(120, 100); ctx.lineTo(145, 130);
+        break;
+    }
+    ctx.stroke();
+  }
+
+  function checkWin() {
+    // Check if every letter in currentWord is in guessedLetters
+    const won = currentWord.split('').every(char => 
+      guessedLetters.includes(char) || !/[A-Z]/.test(char)
+    );
+    
+    if (won) {
+      document.getElementById('feedback').innerText = "Correct! 🎉";
+      document.getElementById('feedback').style.color = "#2E7D32";
+      document.getElementById('snd_clap').play();
+      confettiBurst();
+      
+      // Disable keyboard
+      Array.from(document.getElementsByClassName('key')).forEach(k => k.style.pointerEvents = 'none');
+      
+      setTimeout(nextWord, 1500);
+    }
+  }
+
+  function checkLoss() {
+    if (mistakes >= maxMistakes) {
+      document.getElementById('feedback').innerHTML = "Oops! It was: <span style='color:#C62828'>" + currentWord + "</span>";
+      // Reveal all letters
+      guessedLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+      updateWordDisplay();
+    }
+  }
+
+  function skipWord() { nextWord(); }
+
+  function nextWord() {
+    currentIndex++;
+    if (currentIndex >= words.length) {
+      showScreen('winScreen');
+      document.getElementById('snd_win').play();
+      confettiBurst();
+    } else {
+      loadWord();
+    }
+  }
+
+  function speakCurrent() {
+    // Speak the original case word (better for pronunciation)
+    const u = new SpeechSynthesisUtterance(words[currentIndex]);
+    u.lang = 'en-GB'; u.rate = 0.8;
+    speechSynthesis.speak(u);
+  }
+
+  function editList() { showScreen('setupScreen'); }
+  
+  function clearStorage() {
+    if(confirm("Clear words?")) { localStorage.removeItem('hangmanWords'); document.getElementById('wordListInput').value = ''; }
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // Confetti Effect
+  function confettiBurst() {
+    const c = document.getElementById('confetti'); 
+    c.style.display='block'; c.width = window.innerWidth; c.height = window.innerHeight;
+    const ctx = c.getContext('2d');
+    const cols = ['#F44336','#2196F3','#FFEB3B','#4CAF50','#9C27B0'];
+    const p = Array.from({length:200}, ()=>({x:c.width/2,y:c.height/2,c:cols[Math.floor(Math.random()*cols.length)],a:Math.random()*6.28,v:Math.random()*10+5,s:Math.random()*10+4}));
+    let f=0;
+    const anim = setInterval(()=>{
+        ctx.clearRect(0,0,c.width,c.height);
+        p.forEach(o=>{o.x+=Math.cos(o.a)*o.v;o.y+=Math.sin(o.a)*o.v+3;ctx.fillStyle=o.c;ctx.fillRect(o.x,o.y,o.s,o.s);});
+        if(++f>60){clearInterval(anim);c.style.display='none';}
+    },30);
+  }
+</script>
+</body>
+</html>
