@@ -3,143 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cinnamoroll 默寫小天地</title>
+    <title>玉桂狗全句默寫王</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <style>
-        :root {
-            --cinna-blue: #b3e5fc;
-            --cinna-pink: #ffc1e3;
-            --soft-bg: #fdfdfd;
-        }
+        :root { --cinna-blue: #b3e5fc; --cinna-pink: #ffc1e3; --soft-bg: #f9feff; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--soft-bg); color: #5d5d5d; margin: 0; padding: 15px; text-align: center; touch-action: manipulation; }
+        
+        .header { background: white; border-radius: 30px; padding: 15px; margin-bottom: 15px; border: 4px solid var(--cinna-blue); position: relative; }
+        .chibi-img { width: 100px; height: auto; }
 
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f0faff;
-            color: #5d5d5d; margin: 0; padding: 15px;
-            text-align: center; touch-action: manipulation;
-        }
+        /* 全句播放按鈕 */
+        .full-audio-panel { background: #fff; border-radius: 20px; padding: 15px; border: 2px solid var(--cinna-pink); margin-bottom: 20px; display: none; }
+        .play-all-btn { background: var(--cinna-pink); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 900; font-size: 1.1rem; box-shadow: 0 4px 0 #f48fb1; width: 100%; }
 
-        /* 頂部標題 */
-        .header {
-            background: white; border-radius: 30px; padding: 20px;
-            margin-bottom: 20px; border: 4px solid var(--cinna-blue);
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .chibi-img { width: 140px; height: auto; margin-bottom: 10px; }
+        .input-card { background: white; border-radius: 25px; padding: 20px; box-shadow: 0 8px 15px rgba(179,229,252,0.2); margin-bottom: 20px; }
+        #dictation-input { width: 100%; border: none; font-size: 1.3rem; outline: none; padding: 15px; text-align: center; border-bottom: 3px solid var(--cinna-blue); margin-bottom: 15px; box-sizing: border-box; }
+        
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-v { background: var(--cinna-blue); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; }
+        .btn-c { background: #eee; color: #999; border: none; padding: 15px; border-radius: 15px; }
 
-        /* 使用說明 */
-        .guide-text {
-            background: rgba(255, 255, 255, 0.7); border-radius: 15px;
-            padding: 10px; font-size: 0.9rem; color: #6bb9f0;
-            margin-bottom: 20px; border: 1px solid var(--cinna-blue);
-        }
+        .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 12px; margin-bottom: 30px; }
+        .word-tile { aspect-ratio: 1/1; background: white; border: 3px solid var(--cinna-blue); border-radius: 18px; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; position: relative; transition: 0.2s; }
+        .word-tile.completed { border-color: var(--cinna-pink); background: #fffcfd; }
+        .word-tile.completed::after { content: '🍭'; position: absolute; top: -8px; right: -8px; font-size: 1.2rem; }
 
-        /* 輸入控制台 */
-        .control-card {
-            background: white; border-radius: 25px; padding: 20px;
-            box-shadow: 0 10px 20px rgba(179, 229, 252, 0.3);
-            margin-bottom: 25px;
-        }
-        #dictation-input {
-            width: 100%; border: none; font-size: 1.4rem; outline: none;
-            padding: 15px; color: #5d5d5d; text-align: center;
-            border-bottom: 3px solid var(--cinna-blue); margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-
-        .btn-main {
-            background: var(--cinna-blue); color: white; border: none;
-            width: 100%; padding: 18px; border-radius: 20px;
-            font-size: 1.2rem; font-weight: 900; box-shadow: 0 4px 0 #81d4fa;
-            active: transform: translateY(2px);
-        }
-
-        /* 練習方塊 */
-        .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .word-tile {
-            aspect-ratio: 1/1; background: white; border: 4px solid var(--cinna-blue);
-            border-radius: 20px; font-size: 2.5rem; display: flex;
-            align-items: center; justify-content: center; position: relative;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
-        }
-        .word-tile.completed { border-color: var(--cinna-pink); background: #fff9fb; }
-        .word-tile.completed::after { content: '🎀'; position: absolute; top: -10px; right: -10px; font-size: 1.5rem; }
-
-        /* 獎勵牆 */
-        .award-wall {
-            background: white; border-radius: 25px; padding: 20px;
-            border: 3px solid var(--cinna-pink);
-        }
-        .award-title { color: var(--cinna-pink); font-weight: 900; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .reward-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .reward-item {
-            background: #f9f9f9; border-radius: 15px; padding: 10px;
-            filter: grayscale(1) opacity(0.2); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .reward-item.unlocked { filter: grayscale(0) opacity(1); background: #fff0f6; transform: scale(1.1); border: 2px solid var(--cinna-pink); }
-        .reward-item img { width: 100%; height: auto; }
-
-        /* 練習視窗 */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.98); z-index: 1000; justify-content: center; align-items: center;
-        }
-        .modal-box {
-            width: 90%; max-width: 400px; text-align: center;
-        }
-        #writer-canvas { 
-            background: white; margin: 20px auto; border-radius: 25px; 
-            border: 4px solid #eee; width: 280px; height: 280px;
-        }
-        .action-btns { display: grid; grid-template-columns: 1fr; gap: 15px; padding: 0 20px; }
-        .speak-btn { background: #e1f5fe; color: #0288d1; border: none; padding: 15px; border-radius: 15px; font-weight: bold; font-size: 1.1rem; }
-        .ghost-btn { background: var(--cinna-pink); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 1.3rem; box-shadow: 0 4px 0 #f48fb1; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { width: 90%; max-width: 380px; text-align: center; }
+        #writer-canvas { background: white; margin: 15px auto; border-radius: 20px; border: 3px solid #f0f0f0; width: 280px; height: 280px; }
+        
+        .quiz-btn { background: var(--cinna-pink); color: white; border: none; padding: 20px; border-radius: 20px; font-weight: 900; font-size: 1.4rem; width: 100%; box-shadow: 0 5px 0 #f06292; }
+        .hint-btn { background: #e1f5fe; color: #0288d1; border: none; padding: 12px; border-radius: 12px; width: 100%; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <img src="https://img.icons8.com/color/144/cinnamoroll.png" class="chibi-img">
-        <h2 style="margin:0; color: #546e7a;">玉桂狗默寫基地</h2>
+        <h2 style="margin:5px 0; color: #546e7a;">玉桂狗默寫特訓</h2>
     </div>
 
-    <div class="guide-text">
-        ☁️ <b>第一步：</b> 點擊錄音說出默寫單字<br>
-        ☁️ <b>第二步：</b> 點擊字方塊挑戰<b>「默寫」</b><br>
-        ☁️ <b>第三步：</b> 贏取可愛甜點獎勵！
+    <div class="input-card">
+        <input type="text" id="dictation-input" placeholder="錄入全句默寫課文..." />
+        <div class="btn-grid">
+            <button class="btn-v" id="btn-voice">🎤 語音輸入句子</button>
+            <button class="btn-c" onclick="clearData()">🗑️ 清除</button>
+        </div>
     </div>
 
-    <div class="control-card">
-        <input type="text" id="dictation-input" placeholder="在這裡輸入或錄音..." spellcheck="false">
-        <button class="btn-main" id="btn-voice">🎤 廣東話語音輸入</button>
+    <div class="full-audio-panel" id="audio-panel">
+        <p style="margin:0 0 10px 0; font-size: 0.8rem; color: #f06292;">✨ 聽默模式：聽完玉桂狗讀整句再寫喔！</p>
+        <button class="play-all-btn" onclick="sayFullSentence()">🔊 播放整句默寫 (廣東話)</button>
     </div>
 
     <div class="word-grid" id="tiles"></div>
 
-    <div class="award-wall">
-        <div class="award-title">🍬 <span>我的甜點收集卡</span> 🍭</div>
-        <div class="reward-grid" id="gallery">
-            <div class="reward-item"><img src="https://img.icons8.com/color/96/strawberry.png"></div>
-            <div class="reward-item"><img src="https://img.icons8.com/color/96/cupcake.png"></div>
-            <div class="reward-item"><img src="https://img.icons8.com/color/96/doughnut.png"></div>
-            <div class="reward-item"><img src="https://img.icons8.com/color/96/ice-cream-cone.png"></div>
-            <div class="reward-item"><img src="https://img.icons8.com/color/96/candy--v1.png"></div>
-            <div class="reward-item"><img src="https://img.icons8.com/color/96/pancakes.png"></div>
-            <div class="reward-item"><img src="https://img.icons8.com/color/96/cookie.png"></div>
-            <div class="reward-item"><img src="https://img.icons8.com/color/96/birthday-cake.png"></div>
-        </div>
-    </div>
-
     <div id="modal" class="modal">
         <div class="modal-box">
-            <h1 id="modal-char" style="font-size: 3rem; color: var(--cinna-blue); margin: 0;">字</h1>
+            <button class="hint-btn" onclick="sayChar()">🔊 聽讀音 (單字)</button>
             <div id="writer-canvas"></div>
-            <div class="action-btns">
-                <button class="speak-btn" onclick="sayChar()">🔊 聽聽讀音 (廣東話)</button>
-                <button class="ghost-btn" onclick="startGhost()">🧠 挑戰默寫 (Memory)</button>
-                <button onclick="closeModal()" style="background:none; border:none; color:#bbb; margin-top:10px;">[ 取消返回 ]</button>
-            </div>
+            <button class="quiz-btn" onclick="startGhost()">🧠 挑戰默寫</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:#aaa; margin-top:20px;">[ 返回 ]</button>
         </div>
     </div>
 
@@ -147,23 +72,52 @@
         let writer = null;
         let activeChar = '';
         let activeTile = null;
-        let masterCount = 0;
 
-        // --- 語音功能 ---
         const Speech = window.webkitSpeechRecognition || window.SpeechRecognition;
         if (Speech) {
             const rec = new Speech();
             rec.lang = 'zh-HK';
-            document.getElementById('btn-voice').onclick = () => {
-                rec.start();
-                document.getElementById('btn-voice').innerText = "聆聽中...請說話";
-            };
+            document.getElementById('btn-voice').onclick = () => { rec.start(); document.getElementById('btn-voice').innerText = "聆聽中..."; };
             rec.onresult = (e) => {
                 const text = e.results[0][0].transcript;
                 document.getElementById('dictation-input').value = text;
                 render(text);
-                document.getElementById('btn-voice').innerText = "🎤 廣東話語音輸入";
+                document.getElementById('btn-voice').innerText = "🎤 語音輸入句子";
             };
+        }
+
+        function render(text) {
+            const container = document.getElementById('tiles');
+            const audioPanel = document.getElementById('audio-panel');
+            container.innerHTML = '';
+            
+            if (text.length > 0) {
+                audioPanel.style.display = 'block';
+                text.split('').forEach(char => {
+                    if (/[，。！？、\s]/.test(char)) {
+                        const s = document.createElement('div');
+                        s.style.cssText = "font-size:1.5rem; line-height:70px; color:#ccc;";
+                        s.innerText = char;
+                        container.appendChild(s);
+                        return;
+                    }
+                    const tile = document.createElement('div');
+                    tile.className = 'word-tile';
+                    tile.innerText = char;
+                    tile.onclick = () => openModal(char, tile);
+                    container.appendChild(tile);
+                });
+            } else {
+                audioPanel.style.display = 'none';
+            }
+        }
+
+        function sayFullSentence() {
+            const text = document.getElementById('dictation-input').value;
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'zh-HK';
+            u.rate = 0.8; // 稍微慢一點點，讓小朋友聽得清楚
+            window.speechSynthesis.speak(u);
         }
 
         function sayChar() {
@@ -172,59 +126,28 @@
             window.speechSynthesis.speak(u);
         }
 
-        // --- 核心邏輯 ---
-        function render(text) {
-            const container = document.getElementById('tiles');
-            container.innerHTML = '';
-            text.split('').forEach(char => {
-                if (/[，。！？、\s]/.test(char)) return;
-                const tile = document.createElement('div');
-                tile.className = 'word-tile';
-                tile.innerText = char;
-                tile.onclick = () => openModal(char, tile);
-                container.appendChild(tile);
-            });
-        }
-
         function openModal(char, tile) {
-            activeChar = char;
-            activeTile = tile;
+            activeChar = char; activeTile = tile;
             document.getElementById('modal').style.display = 'flex';
             document.getElementById('writer-canvas').innerHTML = '';
-            document.getElementById('modal-char').innerText = char;
-            
             writer = HanziWriter.create('writer-canvas', char, {
                 width: 280, height: 280, padding: 20,
-                strokeColor: '#5d5d5d', radicalColor: '#ffc1e3',
-                drawingWidth: 30, // 適合手指書寫
-                showOutline: true
+                strokeColor: '#555', radicalColor: '#ffc1e3', drawingWidth: 30, showOutline: true
             });
             writer.animateCharacter();
         }
 
         function startGhost() {
             writer.hideOutline();
-            writer.quiz({
-                onComplete: () => {
-                    if (!activeTile.classList.contains('completed')) {
-                        activeTile.classList.add('completed');
-                        masterCount++;
-                        updateAwards();
-                    }
-                    setTimeout(closeModal, 800);
-                }
-            });
+            writer.quiz({ onComplete: () => { activeTile.classList.add('completed'); setTimeout(closeModal, 800); } });
         }
 
-        function updateAwards() {
-            const items = document.querySelectorAll('.reward-item');
-            if (masterCount > 0 && masterCount <= items.length) {
-                items[masterCount - 1].classList.add('unlocked');
-            }
+        function clearData() {
+            document.getElementById('dictation-input').value = '';
+            render('');
         }
 
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
         document.getElementById('dictation-input').oninput = (e) => render(e.target.value);
     </script>
 </body>
