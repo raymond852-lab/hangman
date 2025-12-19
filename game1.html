@@ -3,174 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cinnamoroll 學習小天地</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=Varela+Round&display=swap" rel="stylesheet">
+    <title>Cinnamoroll 默寫小天地</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <style>
         :root {
             --cinna-blue: #b3e5fc;
             --cinna-pink: #ffc1e3;
-            --soft-white: #ffffff;
-            --text-gray: #5d5d5d;
+            --soft-bg: #f5fbff;
         }
 
         body {
-            font-family: 'Varela Round', 'Noto Sans TC', sans-serif;
-            background-color: #f0faff;
-            background-image: radial-gradient(#b3e5fc 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: var(--text-gray);
-            margin: 0; padding: 15px;
-            text-align: center;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--soft-bg);
+            color: #5d5d5d; margin: 0; padding: 10px;
+            text-align: center; touch-action: manipulation;
         }
 
-        /* Header Area */
+        /* 頂部區域 */
         .header {
-            background: white; border-radius: 30px; padding: 15px;
-            box-shadow: 0 5px 15px rgba(179, 229, 252, 0.4);
-            margin-bottom: 20px; border: 3px solid var(--cinna-blue);
+            background: white; border-radius: 25px; padding: 15px;
+            margin-bottom: 15px; border: 3px solid var(--cinna-blue);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        .chibi-img { width: 80px; height: auto; }
+        .chibi-img { width: 120px; height: auto; border-radius: 15px; }
 
-        /* Input Area */
-        .input-box {
+        /* 使用說明 */
+        .guide-box {
+            background: #fff; border-radius: 15px; padding: 10px;
+            font-size: 0.85rem; color: #78909c; border: 1px solid var(--cinna-blue);
+            margin-bottom: 15px; line-height: 1.5;
+        }
+
+        /* 輸入區域 */
+        .input-panel {
             background: white; border-radius: 20px; padding: 15px;
-            margin-bottom: 20px; border: 2px dashed var(--cinna-blue);
+            border: 2px dashed var(--cinna-blue); margin-bottom: 20px;
         }
         #dictation-input {
-            width: 100%; border: none; font-size: 1.1rem; outline: none;
-            padding: 10px; color: var(--text-gray); text-align: center;
+            width: 90%; border: none; font-size: 1.2rem; outline: none;
+            padding: 10px; color: #5d5d5d; text-align: center; border-bottom: 2px solid #eee;
         }
+        .btn-row { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
+        .action-btn {
+            border: none; padding: 12px 20px; border-radius: 50px; 
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .voice-btn { background: var(--cinna-blue); color: white; }
+        .clear-btn { background: #eee; color: #999; }
 
-        .voice-btn {
-            background: var(--cinna-blue); color: white; border: none;
-            padding: 12px 25px; border-radius: 50px; font-weight: bold;
-            margin-top: 10px; cursor: pointer; display: flex; align-items: center;
-            justify-content: center; gap: 10px; margin-inline: auto;
+        /* 練習區 */
+        .word-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+        .word-tile {
+            width: 65px; height: 65px; line-height: 65px; font-size: 2.2rem;
+            background: white; border: 3px solid var(--cinna-blue); border-radius: 15px;
+            cursor: pointer; position: relative;
         }
+        .word-tile.completed { border-color: var(--cinna-pink); background: #fff9fb; }
+        .word-tile.completed::after { content: '⭐'; position: absolute; top: -12px; right: -5px; font-size: 1.2rem; }
 
-        /* Word Tiles */
-        .study-area {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+        /* 獎勵圖鑒 */
+        .gallery {
+            margin-top: 30px; padding: 15px; background: white; border-radius: 20px;
+            border: 2px solid var(--cinna-pink);
         }
-        .word-card {
-            background: white; width: 70px; height: 70px; line-height: 70px;
-            font-size: 2.2rem; border-radius: 15px; border: 3px solid var(--cinna-blue);
-            cursor: pointer; position: relative; transition: 0.3s;
-        }
-        .word-card.done { border-color: var(--cinna-pink); background: #fff9fb; }
-        .word-card.done::after { content: '🌸'; position: absolute; top: -10px; right: -10px; font-size: 1.2rem; }
+        .sticker-box { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
+        .sticker { width: 50px; height: 50px; filter: grayscale(1); opacity: 0.3; transition: 0.5s; }
+        .sticker.active { filter: grayscale(0); opacity: 1; transform: scale(1.1); }
 
-        /* Modal Practice */
+        /* 彈窗 */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 100; justify-content: center; align-items: center;
+            background: rgba(255,255,255,0.95); z-index: 1000; justify-content: center; align-items: center;
         }
         .modal-content {
-            background: white; width: 90%; max-width: 360px; padding: 25px;
-            border-radius: 40px; border: 4px solid var(--cinna-blue); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: white; width: 85%; max-width: 350px; padding: 25px;
+            border-radius: 35px; border: 5px solid var(--cinna-blue); text-align: center;
         }
-        #canvas-container { background: #fff; margin: 20px auto; border-radius: 20px; width: 250px; height: 250px; border: 2px solid #eee; }
-
-        .btn-group { display: flex; flex-direction: column; gap: 10px; }
-        .pink-btn { background: var(--cinna-pink); color: white; border: none; padding: 15px; border-radius: 20px; font-size: 1.1rem; font-weight: bold; }
-        .blue-btn { background: var(--cinna-blue); color: white; border: none; padding: 12px; border-radius: 20px; }
+        #writer-box { background: #fff; margin: 15px auto; border-radius: 20px; border: 2px solid #f0f0f0; }
+        .quiz-btn { background: var(--cinna-pink); color: white; font-size: 1.2rem; width: 100%; margin-top: 10px; }
+        .speak-btn { background: #e3f2fd; color: #1e88e5; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <img src="https://i.pinimg.com/originals/18/1e/86/181e868f00673d463a8a370b898971f1.png" class="chibi-img" alt="Cinnamoroll">
-        <h2 style="margin:5px 0; color: #78909c;">我的默寫小天地</h2>
+        <img src="https://img.icons8.com/color/144/cinnamoroll.png" class="chibi-img" alt="Cinnamoroll">
+        <h2 style="margin:5px 0; color: #78909c;">玉桂狗默寫小天地</h2>
     </div>
 
-    <div class="input-box">
-        <input type="text" id="dictation-input" placeholder="點擊錄音或輸入單字..." />
-        <button class="voice-btn" id="voice-start">
-            <span>🎤</span> 廣東話語音輸入
-        </button>
+    <div class="guide-box">
+        <b>💖 使用說明：</b><br>
+        1. 點擊<b>「語音輸入」</b>說出你想練習的詞語 (廣東話)。<br>
+        2. 點擊方塊開始練習。先看筆順，再挑戰<b>「默寫」</b>！
     </div>
 
-    <div class="study-area" id="word-list">
+    <div class="input-panel">
+        <input type="text" id="dictation-input" placeholder="在這裡輸入文字..." />
+        <div class="btn-row">
+            <button class="action-btn voice-btn" id="start-voice">🎤 廣東話語音輸入</button>
+            <button class="action-btn clear-btn" onclick="resetApp()">🗑️ 清除</button>
         </div>
+    </div>
+
+    <div class="word-grid" id="tile-container"></div>
+
+    <div class="gallery">
+        <h4 style="margin:0; color:var(--cinna-pink);">🌸 我的獎勵圖鑒</h4>
+        <p style="font-size:0.7rem; margin:5px 0;">每學會一個字，就會解鎖一個裝飾喔！</p>
+        <div class="sticker-box" id="sticker-gallery">
+            <img src="https://img.icons8.com/color/96/cupcake.png" class="sticker">
+            <img src="https://img.icons8.com/color/96/doughnut.png" class="sticker">
+            <img src="https://img.icons8.com/color/96/ice-cream-cone.png" class="sticker">
+            <img src="https://img.icons8.com/color/96/lollipop.png" class="sticker">
+            <img src="https://img.icons8.com/color/96/macaron.png" class="sticker">
+            <img src="https://img.icons8.com/color/96/cookie.png" class="sticker">
+        </div>
+    </div>
 
     <div id="practice-modal" class="modal">
         <div class="modal-content">
-            <div style="font-size: 2rem; color: var(--cinna-blue); font-weight: bold;" id="target-char">字</div>
-            <div id="canvas-container"></div>
-            <div class="btn-group">
-                <button class="blue-btn" onclick="writer.animateCharacter()">👀 觀察筆順 (Watch)</button>
-                <button class="pink-btn" onclick="startQuiz()">🧠 默寫挑戰 (Memory Test)</button>
-            </div>
-            <button onclick="closeModal()" style="background:none; border:none; color:#aaa; margin-top:15px; cursor:pointer;">取消</button>
+            <button class="action-btn speak-btn" onclick="speakActiveChar()">🔊 聽聽讀音 (廣東話)</button>
+            <div id="writer-box"></div>
+            <button class="action-btn quiz-btn" onclick="startMemoryTest()">🧠 開始默寫挑戰</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:#aaa; margin-top:20px; font-weight:bold;">返回</button>
         </div>
     </div>
 
     <script>
         let writer = null;
+        let activeChar = '';
         let activeTile = null;
-        let speechRecognition = window.webkitSpeechRecognition || window.Recognition;
+        let masterCount = 0;
 
-        // 1. Voice-to-Text (HK Cantonese)
-        if (speechRecognition) {
-            const recognition = new speechRecognition();
+        // 1. 廣東話語音輸入
+        const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
             recognition.lang = 'zh-HK';
-            
-            document.getElementById('voice-start').onclick = () => {
+            document.getElementById('start-voice').onclick = () => {
                 recognition.start();
-                document.getElementById('voice-start').innerText = "正在聆聽...";
+                document.getElementById('start-voice').innerText = "正在聆聽...";
             };
-
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript;
+            recognition.onresult = (e) => {
+                const text = e.results[0][0].transcript;
                 document.getElementById('dictation-input').value = text;
-                document.getElementById('voice-start').innerHTML = "<span>🎤</span> 廣東話語音輸入";
-                generateTiles(text);
+                renderTiles(text);
+                document.getElementById('start-voice').innerText = "🎤 廣東話語音輸入";
             };
         }
 
-        // 2. Tile Generation
-        function generateTiles(text) {
-            const list = document.getElementById('word-list');
-            list.innerHTML = '';
+        // 2. 廣東話朗讀
+        function speakActiveChar() {
+            const utterance = new SpeechSynthesisUtterance(activeChar);
+            utterance.lang = 'zh-HK';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // 3. 渲染字體方塊
+        function renderTiles(text) {
+            const container = document.getElementById('tile-container');
+            container.innerHTML = '';
             text.split('').forEach(char => {
-                if (/[，。？！]/.test(char)) return;
-                const div = document.createElement('div');
-                div.className = 'word-card';
-                div.innerText = char;
-                div.onclick = () => openModal(char, div);
-                list.appendChild(div);
+                if (/[，。！？、]/.test(char)) return;
+                const tile = document.createElement('div');
+                tile.className = 'word-tile';
+                tile.innerText = char;
+                tile.onclick = () => openModal(char, tile);
+                container.appendChild(tile);
             });
         }
 
-        // 3. Practice Logic
+        // 4. 練習彈窗
         function openModal(char, tile) {
+            activeChar = char;
             activeTile = tile;
             document.getElementById('practice-modal').style.display = 'flex';
-            document.getElementById('target-char').innerText = char;
-            document.getElementById('canvas-container').innerHTML = '';
+            document.getElementById('writer-box').innerHTML = '';
             
-            writer = HanziWriter.create('canvas-container', char, {
+            writer = HanziWriter.create('writer-box', char, {
                 width: 250, height: 250, padding: 20,
                 strokeColor: '#5d5d5d', radicalColor: '#ffc1e3',
                 drawingWidth: 25, showOutline: true
             });
+            writer.animateCharacter();
         }
 
-        function startQuiz() {
+        function startMemoryTest() {
             writer.hideOutline();
             writer.quiz({
                 onComplete: () => {
-                    activeTile.classList.add('done');
+                    if (!activeTile.classList.contains('completed')) {
+                        activeTile.classList.add('completed');
+                        masterCount++;
+                        updateGallery();
+                    }
                     setTimeout(closeModal, 800);
                 }
             });
         }
 
+        // 5. 獎勵系統
+        function updateGallery() {
+            const stickers = document.querySelectorAll('.sticker');
+            if (masterCount > 0 && masterCount <= stickers.length) {
+                stickers[masterCount - 1].classList.add('active');
+            }
+        }
+
+        function resetApp() {
+            document.getElementById('dictation-input').value = '';
+            document.getElementById('tile-container').innerHTML = '';
+            masterCount = 0;
+            document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
+        }
+
         function closeModal() { document.getElementById('practice-modal').style.display = 'none'; }
 
-        // Allow manual typing too
-        document.getElementById('dictation-input').oninput = (e) => generateTiles(e.target.value);
+        // 監控手動輸入
+        document.getElementById('dictation-input').addEventListener('input', (e) => renderTiles(e.target.value));
     </script>
 </body>
 </html>
