@@ -3,163 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>玉桂狗自主默寫王 - 強化版</title>
+    <title>玉桂狗小三默書特訓</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <style>
         :root { --cinna-blue: #b3e5fc; --cinna-pink: #ffc1e3; --bg: #f9feff; }
         body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; text-align: center; }
         
-        .header { background: white; border-radius: 20px; padding: 15px; border: 3px solid var(--cinna-blue); margin-bottom: 15px; }
+        .header { background: white; border-radius: 20px; padding: 15px; border: 3px solid var(--cinna-blue); margin-bottom: 10px; }
         .hero-img { width: 80px; height: 80px; margin: 0 auto; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,50 Q20,30 50,30 T80,50 T50,70 T20,50' fill='%23fff' stroke='%23b3e5fc' stroke-width='3'/%3E%3Ccircle cx='40' cy='48' r='3' fill='%235d5d5d'/%3E%3Ccircle cx='60' cy='48' r='3' fill='%235d5d5d'/%3E%3Cpath d='M45,58 Q50,62 55,58' stroke='%23ffc1e3' fill='none' stroke-width='2'/%3E%3Cpath d='M10,45 Q5,35 15,30 Q25,25 30,40' fill='%23fff' stroke='%23b3e5fc' stroke-width='2'/%3E%3Cpath d='M90,45 Q95,35 85,30 Q75,25 70,40' fill='%23fff' stroke='%23b3e5fc' stroke-width='2'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; }
 
-        .input-panel { background: white; border-radius: 20px; padding: 25px; border: 2px dashed var(--cinna-blue); }
-        #dictation-input { width: 100%; border: none; font-size: 1.5rem; border-bottom: 3px solid var(--cinna-blue); margin-bottom: 20px; outline: none; text-align: center; }
+        .setup-card { background: white; border-radius: 20px; padding: 20px; border: 2px dashed var(--cinna-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        #dictation-input { width: 100%; border: none; font-size: 1.4rem; border-bottom: 3px solid var(--cinna-blue); margin-bottom: 20px; text-align: center; padding: 10px 0; outline: none; }
         
-        /* 引導動畫 */
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 20px var(--cinna-pink); } 100% { transform: scale(1); } }
-        .pulse-btn { animation: pulse 1.5s infinite; }
+        .btn { border: none; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-voice { background: #e1f5fe; color: #0288d1; padding: 12px; width: 100%; margin-bottom: 10px; border: 1px solid var(--cinna-blue); }
+        .btn-start { background: var(--cinna-pink); color: white; padding: 18px; width: 100%; font-size: 1.5rem; box-shadow: 0 5px 0 #f06292; }
+        
+        /* 模式選擇器 */
+        .mode-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .mode-opt { flex: 1; padding: 10px; border-radius: 12px; border: 2px solid #eee; background: white; font-size: 0.9rem; }
+        .mode-opt.active { border-color: var(--cinna-blue); background: #f0faff; color: #0288d1; }
 
-        .voice-btn { background: #e1f5fe; color: #0288d1; border: 2px solid #b3e5fc; padding: 15px; border-radius: 15px; width: 100%; font-weight: bold; margin-bottom: 15px; }
-        .start-btn { background: var(--cinna-pink); color: white; border: none; padding: 20px; border-radius: 50px; font-weight: 900; font-size: 1.5rem; width: 100%; box-shadow: 0 6px 0 #f06292; }
+        /* 練習區 */
+        .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
+        .tile { width: 45px; height: 45px; background: white; border: 2px solid #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center; visibility: hidden; }
+        .tile.done { visibility: visible; border-color: var(--cinna-pink); color: #555; font-size: 1.5rem; }
 
+        /* 寫字視窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        #writer-canvas { border: 6px solid #f0faff; border-radius: 30px; width: 320px; height: 320px; margin: 15px 0; }
-
-        /* 休息功能 UI */
-        .pause-btn { position: absolute; top: 20px; right: 20px; background: #fff; border: 2px solid #eee; padding: 10px; border-radius: 15px; font-size: 0.8rem; }
-        .summary-box { background: white; padding: 30px; border-radius: 25px; border: 3px solid var(--cinna-blue); text-align: center; display: none; }
+        #writer-canvas { border: 5px solid #f0faff; border-radius: 25px; width: 320px; height: 320px; margin: 15px 0; }
+        .hint-btn { background: #fffde7; border: 2px solid #fbc02d; color: #f57f17; padding: 8px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; }
+        
+        /* 結算畫面 */
+        .result-screen { display: none; padding: 30px; }
+        .stars { font-size: 3rem; color: #fbc02d; margin: 10px 0; }
     </style>
 </head>
 <body>
 
-    <div id="setup-ui">
+    <div id="setup-page">
         <div class="header">
             <div class="hero-img"></div>
-            <h2 id="setup-title">讀出課文，我就會幫你默書！</h2>
+            <h2 style="color:#546e7a">小三默書特訓</h2>
         </div>
-        <div class="input-panel">
-            <input type="text" id="dictation-input" placeholder="等待語音錄入..." />
-            <button class="voice-btn" id="voice-btn">🎤 按一下，開始說話</button>
-            <button class="start-btn" id="go-btn" onclick="startFlow()">🚀 開始默寫</button>
-        </div>
-    </div>
-
-    <div id="summary-ui" class="modal" style="background: rgba(255,255,255,0.9);">
-        <div class="summary-box" style="display:block;">
-            <h2 style="color:var(--cinna-blue)">☕ 休息時間</h2>
-            <p id="progress-text" style="font-size: 1.2rem; margin: 20px 0;"></p>
-            <button class="start-btn" onclick="resumeFlow()">💪 我休息好了，繼續！</button>
+        <div class="setup-card">
+            <div class="mode-container">
+                <div class="mode-opt active" id="m-ipad" onclick="switchMode('ipad')">iPad 直接寫</div>
+                <div class="mode-opt" id="m-paper" onclick="switchMode('paper')">紙筆默書模式</div>
+            </div>
+            <input type="text" id="dictation-input" placeholder="請說出或輸入課文" />
+            <button class="btn btn-voice" id="voice-btn">🎤 錄音輸入課文</button>
+            <button class="btn btn-start" onclick="start()">🚀 開始挑戰</button>
         </div>
     </div>
 
-    <div id="practice-ui" style="display:none;">
-        <div id="grid" class="word-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px;"></div>
+    <div id="practice-page" style="display:none">
+        <div class="grid" id="main-grid"></div>
+        <button onclick="pause()" style="margin-top:30px; background:none; border:none; color:#ccc; text-decoration:underline;">☕ 休息一下</button>
+    </div>
+
+    <div id="finish-page" class="result-screen">
+        <div class="stars">⭐⭐⭐</div>
+        <h1 style="color:var(--cinna-pink)">太厲害了！</h1>
+        <p id="time-report" style="font-size:1.2rem; color:#78909c"></p>
+        <div class="hero-img"></div>
+        <button class="btn btn-start" onclick="location.reload()">再練一次</button>
     </div>
 
     <div id="modal" class="modal">
-        <button class="pause-btn" onclick="pauseFlow()">☕ 休息</button>
-        <div style="font-size: 1.2rem; color: #b3e5fc; font-weight: bold;">第 <span id="char-idx">1</span> 個字</div>
+        <div id="paper-hint" style="display:none; color:#0288d1; font-weight:bold; margin-bottom:10px;">請在默書簿上寫字，寫完按「完成」</div>
+        <button class="hint-btn" onclick="showHint()">💡 救命草 (看 3 秒)</button>
         <div id="writer-canvas"></div>
-        <button onclick="sayWord()" style="background:none; border:2px solid var(--cinna-pink); color:var(--cinna-pink); padding:10px 20px; border-radius:20px; font-weight:bold;">🔊 再聽一次</button>
+        <button onclick="sayWord()" style="background:none; border:none; color:var(--cinna-blue); font-size:1.5rem;">🔊</button>
+        <button id="paper-done-btn" class="btn btn-start" style="display:none; margin-top:10px; width:80%" onclick="paperNext()">完成這個字</button>
     </div>
 
     <script>
+        let mode = 'ipad'; // ipad 或 paper
         let chars = [];
-        let activeIdx = 0;
+        let idx = 0;
         let writer = null;
+        let startTime;
 
-        // 1. 語音錄入與自動引導
+        function switchMode(m) {
+            mode = m;
+            document.getElementById('m-ipad').className = m=='ipad'?'mode-opt active':'mode-opt';
+            document.getElementById('m-paper').className = m=='paper'?'mode-opt active':'mode-opt';
+        }
+
+        // 語音錄入
         const Speech = window.webkitSpeechRecognition || window.SpeechRecognition;
-        if (Speech) {
-            const rec = new Speech();
-            rec.lang = 'zh-HK';
-            document.getElementById('voice-btn').onclick = () => {
-                rec.start();
-                document.getElementById('voice-btn').innerText = "👂 正在聽你說話...";
-            };
-            rec.onresult = (e) => {
-                const result = e.results[0][0].transcript;
-                document.getElementById('dictation-input').value = result;
-                document.getElementById('voice-btn').innerText = "✅ 聽到了！";
-                document.getElementById('setup-title').innerText = "準備好了嗎？點擊下方開始！";
-                document.getElementById('go-btn').classList.add('pulse-btn'); // 按鈕閃爍引導
-                speak("我聽到了，準備好了就按開始吧！");
+        if(Speech) {
+            const rec = new Speech(); rec.lang = 'zh-HK';
+            document.getElementById('voice-btn').onclick = () => { rec.start(); document.getElementById('voice-btn').innerText="👂 正在聽..."; };
+            rec.onresult = (e) => { 
+                document.getElementById('dictation-input').value = e.results[0][0].transcript;
+                document.getElementById('voice-btn').innerText="✅ 錄音完成";
             };
         }
 
-        function startFlow() {
+        function start() {
             const val = document.getElementById('dictation-input').value.trim();
             if(!val) return;
             chars = val.split('');
-            document.getElementById('setup-ui').style.display = 'none';
-            document.getElementById('practice-ui').style.display = 'block';
+            startTime = Date.now();
+            document.getElementById('setup-page').style.display = 'none';
+            document.getElementById('practice-page').style.display = 'block';
             
-            // 初始化背景格
-            const g = document.getElementById('grid'); g.innerHTML = '';
+            const g = document.getElementById('main-grid'); g.innerHTML = '';
             chars.forEach((c, i) => {
-                const d = document.createElement('div');
-                d.id = 't-' + i;
-                d.style.width = '50px'; d.style.height = '50px'; d.style.border = '2px solid #eee'; d.style.borderRadius = '10px';
-                if(/[，。！？、\s]/.test(c)) { d.innerHTML = c; d.style.border = 'none'; }
+                const d = document.createElement('div'); d.className = 'tile'; d.id = 't-'+i;
+                if(/[，。！？、\s]/.test(c)) { d.innerHTML = c; d.style.border='none'; d.classList.add('done'); }
                 g.appendChild(d);
             });
-
-            activeIdx = 0;
-            runNext();
+            idx = 0; next();
         }
 
-        function runNext() {
-            while(activeIdx < chars.length && /[，。！？、\s]/.test(chars[activeIdx])) activeIdx++;
-            if(activeIdx < chars.length) {
-                showModal(chars[activeIdx], activeIdx);
-            } else {
-                alert("🍭 太棒了！全部默完喇！");
-                location.reload();
+        function next() {
+            while(idx < chars.length && /[，。！？、\s]/.test(chars[idx])) idx++;
+            if(idx < chars.length) showTask(chars[idx]);
+            else finish();
+        }
+
+        function showTask(char) {
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('writer-canvas').innerHTML = '';
+            
+            // 紙筆模式 UI 調整
+            const isPaper = (mode === 'paper');
+            document.getElementById('paper-hint').style.display = isPaper ? 'block' : 'none';
+            document.getElementById('paper-done-btn').style.display = isPaper ? 'block' : 'none';
+
+            writer = HanziWriter.create('writer-canvas', char, {
+                width: 320, height: 320, padding: 30, showOutline: false, showCharacter: false, strokeColor: '#546e7a'
+            });
+
+            sayWord();
+            if(!isPaper) {
+                writer.quiz({ onComplete: () => { stepDone(); } });
             }
         }
 
-        function showModal(char, index) {
-            document.getElementById('modal').style.display = 'flex';
-            document.getElementById('writer-canvas').innerHTML = '';
-            document.getElementById('char-idx').innerText = index + 1;
-            
-            writer = HanziWriter.create('writer-canvas', char, {
-                width: 320, height: 320, padding: 30,
-                showOutline: false, showCharacter: false,
-                strokeColor: '#546e7a', drawingWidth: 35
-            });
-            sayWord();
-            writer.quiz({
-                onComplete: () => {
-                    document.getElementById('t-'+index).innerHTML = char;
-                    document.getElementById('t-'+index).style.background = '#fffaff';
-                    setTimeout(() => { activeIdx++; runNext(); }, 600);
-                }
-            });
+        function showHint() {
+            writer.showOutline({ duration: 3000 }); // 救命草提示 3 秒
+            const u = new SpeechSynthesisUtterance("看清楚囉，記住它的部首和寫法");
+            u.lang = 'zh-HK'; window.speechSynthesis.speak(u);
         }
 
-        // 2. 休息與總結功能
-        function pauseFlow() {
-            document.getElementById('modal').style.display = 'none';
-            document.getElementById('summary-ui').style.display = 'flex';
-            const completed = activeIdx;
-            const remaining = chars.filter((c, i) => i >= activeIdx && !/[，。！？、\s]/.test(c)).length;
-            document.getElementById('progress-text').innerHTML = 
-                `你已經寫對了 <b>${completed}</b> 個字！<br>還剩下 <b>${remaining}</b> 個字。<br>休息完我們從第 <b>${activeIdx + 1}</b> 個字開始。`;
-            speak(`休息一下吧，你已經完成 ${completed} 個字了。`);
+        function paperNext() { stepDone(); }
+
+        function stepDone() {
+            const t = document.getElementById('t-'+idx);
+            t.innerHTML = chars[idx]; t.classList.add('done');
+            setTimeout(() => { 
+                document.getElementById('modal').style.display = 'none';
+                idx++; next(); 
+            }, 600);
         }
 
-        function resumeFlow() {
-            document.getElementById('summary-ui').style.display = 'none';
-            runNext(); // 從 activeIdx 自動繼續
+        function finish() {
+            const duration = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('practice-page').style.display = 'none';
+            document.getElementById('finish-page').style.display = 'block';
+            document.getElementById('time-report').innerText = `挑戰成功！用時 ${duration} 秒，妳真棒！`;
+            const u = new SpeechSynthesisUtterance("恭喜妳完成挑戰！妳的小三默書能力又提升了！");
+            u.lang = 'zh-HK'; window.speechSynthesis.speak(u);
         }
 
-        function sayWord() { speak(chars[activeIdx]); }
-        function speak(text) {
-            const u = new SpeechSynthesisUtterance(text);
-            u.lang = 'zh-HK'; u.rate = 0.8;
-            window.speechSynthesis.speak(u);
+        function pause() {
+            alert(`休息一下吧！妳已經完成了 ${idx} 個字。回頭按確定繼續。`);
+        }
+
+        function sayWord() {
+            const u = new SpeechSynthesisUtterance(chars[idx]);
+            u.lang = 'zh-HK'; u.rate = 0.8; window.speechSynthesis.speak(u);
         }
     </script>
 </body>
