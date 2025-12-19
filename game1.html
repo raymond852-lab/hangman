@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>玉桂狗小三默書特訓1</title>
+    <title>玉桂狗默書老師 - 紀錄版</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <style>
@@ -11,23 +11,28 @@
         body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; text-align: center; }
         
         .header { background: white; border-radius: 20px; padding: 15px; border: 3px solid var(--cinna-blue); margin-bottom: 10px; }
-        .hero-img { width: 80px; height: 80px; margin: 0 auto; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,50 Q20,30 50,30 T80,50 T50,70 T20,50' fill='%23fff' stroke='%23b3e5fc' stroke-width='3'/%3E%3Ccircle cx='40' cy='48' r='3' fill='%235d5d5d'/%3E%3Ccircle cx='60' cy='48' r='3' fill='%235d5d5d'/%3E%3Cpath d='M45,58 Q50,62 55,58' stroke='%23ffc1e3' fill='none' stroke-width='2'/%3E%3Cpath d='M10,45 Q5,35 15,30 Q25,25 30,40' fill='%23fff' stroke='%23b3e5fc' stroke-width='2'/%3E%3Cpath d='M90,45 Q95,35 85,30 Q75,25 70,40' fill='%23fff' stroke='%23b3e5fc' stroke-width='2'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; }
+        .hero-img { width: 70px; height: 70px; margin: 0 auto; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,50 Q20,30 50,30 T80,50 T50,70 T20,50' fill='%23fff' stroke='%23b3e5fc' stroke-width='3'/%3E%3Ccircle cx='40' cy='48' r='3' fill='%235d5d5d'/%3E%3Ccircle cx='60' cy='48' r='3' fill='%235d5d5d'/%3E%3Cpath d='M45,58 Q50,62 55,58' stroke='%23ffc1e3' fill='none' stroke-width='2'/%3E%3Cpath d='M10,45 Q5,35 15,30 Q25,25 30,40' fill='%23fff' stroke='%23b3e5fc' stroke-width='2'/%3E%3Cpath d='M90,45 Q95,35 85,30 Q75,25 70,40' fill='%23fff' stroke='%23b3e5fc' stroke-width='2'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; }
 
         .setup-card { background: white; border-radius: 20px; padding: 20px; border: 2px dashed var(--cinna-blue); }
         #dictation-input { width: 100%; border: none; font-size: 1.4rem; border-bottom: 3px solid var(--cinna-blue); margin-bottom: 20px; text-align: center; outline: none; }
         
+        /* 歷史紀錄樣式 */
+        .history-section { margin-top: 20px; text-align: left; }
+        .history-title { font-size: 0.9rem; color: #78909c; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; }
+        .history-item { background: #f0faff; border: 1px solid #e1f5fe; padding: 10px; border-radius: 10px; font-size: 0.9rem; color: #0288d1; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
         .mode-container { display: flex; gap: 10px; margin-bottom: 15px; }
-        .mode-opt { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid #eee; background: white; cursor: pointer; }
+        .mode-opt { flex: 1; padding: 10px; border-radius: 12px; border: 2px solid #eee; background: white; cursor: pointer; font-size: 0.9rem; }
         .mode-opt.active { border-color: var(--cinna-blue); background: #f0faff; font-weight: bold; }
 
-        .btn-start { background: var(--cinna-pink); color: white; border: none; padding: 18px; border-radius: 50px; width: 100%; font-size: 1.5rem; box-shadow: 0 5px 0 #f06292; }
+        .btn-start { background: var(--cinna-pink); color: white; border: none; padding: 18px; border-radius: 50px; width: 100%; font-size: 1.4rem; box-shadow: 0 5px 0 #f06292; }
 
-        /* 寫字視窗 */
+        /* 練習與視窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
         #writer-canvas { border: 5px solid #f0faff; border-radius: 25px; width: 300px; height: 300px; margin: 10px 0; }
-        
-        .phrase-display { font-size: 1.8rem; color: #0288d1; margin-bottom: 15px; font-weight: bold; letter-spacing: 5px; }
-        .btn-next { background: var(--cinna-pink); color: white; padding: 15px 40px; border-radius: 30px; font-size: 1.3rem; border: none; margin-top: 10px; box-shadow: 0 4px 0 #f06292; }
+        .phrase-display { font-size: 1.6rem; color: #0288d1; margin-bottom: 10px; font-weight: bold; padding: 0 20px; }
+        .btn-next { background: var(--cinna-pink); color: white; padding: 12px 30px; border-radius: 30px; font-size: 1.2rem; border: none; margin-top: 10px; box-shadow: 0 4px 0 #f06292; }
     </style>
 </head>
 <body>
@@ -35,39 +40,52 @@
     <div id="setup-page">
         <div class="header">
             <div class="hero-img"></div>
-            <h2 style="color:#546e7a">玉桂狗默書老師</h2>
+            <h3 style="margin:5px 0; color:#546e7a">玉桂狗默書老師</h3>
         </div>
         <div class="setup-card">
             <div class="mode-container">
-                <div class="mode-opt active" id="m-ipad" onclick="setMode('ipad')">iPad 模式<br><small>(逐字練習)</small></div>
-                <div class="mode-opt" id="m-paper" onclick="setMode('paper')">紙筆模式<br><small>(整句朗讀)</small></div>
+                <div class="mode-opt active" id="m-ipad" onclick="setMode('ipad')">iPad 逐字寫</div>
+                <div class="mode-opt" id="m-paper" onclick="setMode('paper')">紙筆整句默</div>
             </div>
-            <input type="text" id="dictation-input" placeholder="錄入課文..." />
+            <input type="text" id="dictation-input" placeholder="請點選下方紀錄或錄入課文" />
             <button class="btn-start" onclick="start()">開始默寫</button>
+
+            <div class="history-section">
+                <div class="history-title">
+                    <span>最近練習過的課文：</span>
+                    <span onclick="clearHistory()" style="color:#ccc; cursor:pointer; text-decoration:underline;">清除</span>
+                </div>
+                <div id="history-list" class="history-list">
+                    </div>
+            </div>
         </div>
     </div>
 
     <div id="modal" class="modal">
-        <div id="status-text" style="color:#bbb; margin-bottom:10px;"></div>
+        <div id="status-text" style="color:#bbb; font-size:0.8rem; margin-bottom:5px;"></div>
         <div id="phrase-show" class="phrase-display"></div>
         
         <div id="ipad-section">
             <div id="writer-canvas"></div>
-            <button onclick="showHint()" style="background:#fffde7; border:1px solid #fbc02d; padding:8px 15px; border-radius:15px; color:#f57f17;">💡 救命草 (3秒)</button>
+            <button onclick="showHint()" style="background:#fffde7; border:1px solid #fbc02d; padding:5px 15px; border-radius:10px; color:#f57f17; font-size:0.9rem;">💡 救命草</button>
         </div>
 
-        <button onclick="sayCurrent()" style="margin: 15px 0; background:none; border:none; font-size:2rem;">🔊</button>
-        <button id="next-btn" class="btn-next" onclick="handleNext()">寫好了，下一段</button>
-        <button onclick="location.reload()" style="margin-top:30px; background:none; border:none; color:#ddd; text-decoration:underline;">結束練習</button>
+        <button onclick="sayCurrent()" style="margin: 10px 0; background:none; border:none; font-size:2rem;">🔊</button>
+        <button id="next-btn" class="btn-next" onclick="handleNext()">這段寫好了</button>
+        <button onclick="location.reload()" style="margin-top:20px; background:none; border:none; color:#ddd; font-size:0.8rem; text-decoration:underline;">結束練習</button>
     </div>
 
     <script>
         let mode = 'ipad';
         let fullText = "";
-        let segments = []; // 存放切分後的短句
+        let segments = [];
         let currentSegIdx = 0;
-        let currentCharIdx = 0; // 用於 iPad 模式
         let writer = null;
+
+        // 初始化：讀取紀錄
+        window.onload = function() {
+            renderHistory();
+        };
 
         function setMode(m) {
             mode = m;
@@ -75,15 +93,44 @@
             document.getElementById('m-paper').classList.toggle('active', m==='paper');
         }
 
+        function saveToHistory(text) {
+            let history = JSON.parse(localStorage.getItem('dictationHistory') || '[]');
+            // 刪除重複的並把新的放在最前面
+            history = history.filter(item => item !== text);
+            history.unshift(text);
+            // 只保留最近 5 條
+            if(history.length > 5) history.pop();
+            localStorage.setItem('dictationHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            const history = JSON.parse(localStorage.getItem('dictationHistory') || '[]');
+            list.innerHTML = history.length ? '' : '<div style="color:#ddd; font-size:0.8rem;">暫無紀錄</div>';
+            history.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerText = item;
+                div.onclick = () => { document.getElementById('dictation-input').value = item; };
+                list.appendChild(div);
+            });
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('dictationHistory');
+            renderHistory();
+        }
+
         function start() {
             fullText = document.getElementById('dictation-input').value.trim();
             if(!fullText) return;
 
+            saveToHistory(fullText); // 儲存到紀錄
+
             if(mode === 'paper') {
-                // 紙筆模式：按標點符號切分 [，。！？、；]
                 segments = fullText.split(/([，。！？、；\s]+)/).filter(s => s.length > 0);
             } else {
-                // iPad 模式：逐字切分
                 segments = fullText.split('');
             }
 
@@ -95,8 +142,6 @@
 
         function runSegment() {
             const seg = segments[currentSegIdx];
-            
-            // 如果是標點符號，自動跳過並進入下一段
             if (/[，。！？、；\s]/.test(seg)) {
                 currentSegIdx++;
                 if (currentSegIdx < segments.length) runSegment();
@@ -104,19 +149,17 @@
                 return;
             }
 
-            document.getElementById('status-text').innerText = `正在進行第 ${currentSegIdx + 1} 段 / 共 ${segments.length} 段`;
+            document.getElementById('status-text').innerText = `段落 ${currentSegIdx + 1} / ${segments.length}`;
             
             if (mode === 'paper') {
-                // 紙筆模式：顯示空白佔位或隱藏文字，主要是聽
-                document.getElementById('phrase-show').innerText = "請聽音默寫...";
+                document.getElementById('phrase-show').innerText = "請聽音默書...";
                 document.getElementById('ipad-section').style.display = 'none';
-                document.getElementById('next-btn').innerText = "這段寫好了";
+                document.getElementById('next-btn').style.display = 'block';
                 sayCurrent();
             } else {
-                // iPad 模式：逐字
                 document.getElementById('phrase-show').innerText = "";
                 document.getElementById('ipad-section').style.display = 'block';
-                document.getElementById('next-btn').style.display = 'none'; // iPad 模式寫完自動跳
+                document.getElementById('next-btn').style.display = 'none';
                 setupWriter(seg);
             }
         }
@@ -124,42 +167,34 @@
         function setupWriter(char) {
             document.getElementById('writer-canvas').innerHTML = '';
             writer = HanziWriter.create('writer-canvas', char, {
-                width: 300, height: 300, padding: 20, showOutline: false, showCharacter: false, strokeColor: '#546e7a', drawingWidth: 30
+                width: 300, height: 300, padding: 20, showOutline: false, showCharacter: false, strokeColor: '#546e7a'
             });
             sayCurrent();
-            writer.quiz({ onComplete: () => {
-                setTimeout(() => { handleNext(); }, 600);
-            }});
+            writer.quiz({ onComplete: () => { setTimeout(handleNext, 600); } });
         }
 
-        function showHint() {
-            if(writer) writer.showOutline({ duration: 3000 });
-        }
+        function showHint() { if(writer) writer.showOutline({ duration: 3000 }); }
 
         function handleNext() {
             currentSegIdx++;
-            if (currentSegIdx < segments.length) {
-                runSegment();
-            } else {
-                finish();
-            }
+            if (currentSegIdx < segments.length) runSegment();
+            else finish();
         }
 
         function sayCurrent() {
             const u = new SpeechSynthesisUtterance(segments[currentSegIdx]);
-            u.lang = 'zh-HK'; u.rate = 0.7; // 稍微慢一點點
+            u.lang = 'zh-HK'; u.rate = 0.7;
             window.speechSynthesis.speak(u);
         }
 
         function finish() {
             document.getElementById('modal').innerHTML = `
                 <div class="hero-img"></div>
-                <h2 style="color:var(--cinna-pink)">🍭 挑戰完成！</h2>
-                <p>妳完成了全句默寫，真棒！</p>
-                <div style="font-size:1.5rem; margin:20px; color:#546e7a">${fullText}</div>
-                <button class="btn-start" onclick="location.reload()">再試一次</button>
+                <h2 style="color:var(--cinna-pink)">🍭 默寫完成！</h2>
+                <div style="font-size:1.2rem; margin:15px; color:#546e7a; line-height:1.6">${fullText}</div>
+                <button class="btn-start" onclick="location.reload()">回到首頁</button>
             `;
-            const u = new SpeechSynthesisUtterance("恭喜妳完成默寫，請檢查紙上的字有沒有寫對喔！");
+            const u = new SpeechSynthesisUtterance("妳完成練習了，真棒！記得檢查一下有沒有寫錯字喔。");
             u.lang = 'zh-HK'; window.speechSynthesis.speak(u);
         }
     </script>
