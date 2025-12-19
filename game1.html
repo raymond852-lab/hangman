@@ -3,70 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>玉桂狗隱身默寫挑戰</title>
+    <title>玉桂狗聽默練習</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <style>
-        :root { --cinna-blue: #b3e5fc; --cinna-pink: #ffc1e3; --soft-bg: #f9feff; }
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--soft-bg); color: #5d5d5d; margin: 0; padding: 15px; text-align: center; touch-action: manipulation; }
-        
-        .header { background: white; border-radius: 30px; padding: 15px; margin-bottom: 15px; border: 4px solid var(--cinna-blue); }
-        .chibi-img { width: 80px; height: auto; }
+        :root { --cinna-blue: #b3e5fc; --cinna-pink: #ffc1e3; --bg: #f9feff; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; text-align: center; }
 
-        /* 隱藏輸入框的容器 */
-        .input-section { margin-bottom: 20px; transition: 0.3s; }
-        .input-section.hidden { opacity: 0.1; filter: blur(5px); pointer-events: none; }
-
-        #dictation-input { width: 100%; border: none; font-size: 1.2rem; padding: 15px; text-align: center; border-bottom: 3px solid var(--cinna-blue); box-sizing: border-box; background: white; border-radius: 15px; }
-
-        /* 全句朗讀 - 這是最重要的按鈕 */
-        .play-all-btn { background: var(--cinna-pink); color: white; border: none; padding: 18px 30px; border-radius: 50px; font-weight: 900; font-size: 1.2rem; box-shadow: 0 5px 0 #f48fb1; width: 100%; margin: 10px 0; }
-
-        /* 練習方塊 - 隱身狀態 */
-        .word-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 20px 0; }
-        .word-tile { 
-            width: 60px; height: 60px; background: white; border: 3px solid var(--cinna-blue); 
-            border-radius: 15px; font-size: 2rem; display: flex; align-items: center; 
-            justify-content: center; color: transparent; /* 文字隱身 */
-            position: relative; cursor: pointer; background-image: url('https://img.icons8.com/color/48/cloud.png');
-            background-repeat: no-repeat; background-position: center; background-size: 30px;
+        /* 頂部裝飾 */
+        .header { background: white; border-radius: 25px; padding: 15px; border: 3px solid var(--cinna-blue); margin-bottom: 10px; }
+        .hero-img { 
+            width: 120px; height: 100px; 
+            background: url('https://static.wikia.nocookie.net/sanrio/images/a/a1/Cinnamoroll_looking_up.png') no-repeat center; 
+            background-size: contain; margin: 0 auto;
         }
-        .word-tile.completed { color: #5d5d5d; border-color: var(--cinna-pink); background-image: none; background-color: #fff0f5; }
-        .word-tile.completed::after { content: '🌸'; position: absolute; top: -10px; right: -10px; font-size: 1.2rem; }
 
-        /* 彈窗 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; justify-content: center; align-items: center; }
-        .modal-box { width: 90%; max-width: 380px; }
-        #writer-canvas { background: white; margin: 20px auto; border-radius: 20px; border: 2px solid #eee; width: 280px; height: 280px; }
+        /* 隱藏輸入框 - 只有按下「修改」才會出現 */
+        .input-panel { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 2px dashed var(--cinna-blue); }
+        #dictation-input { width: 100%; border: none; font-size: 1.2rem; padding: 10px; text-align: center; border-bottom: 2px solid var(--cinna-blue); margin-bottom: 10px; box-sizing: border-box; }
+        .hidden-mode { display: none; }
+
+        /* 全句朗讀大按鈕 */
+        .play-all-btn { background: var(--cinna-pink); color: white; border: none; padding: 18px; border-radius: 50px; font-weight: 900; font-size: 1.3rem; box-shadow: 0 5px 0 #f48fb1; width: 100%; margin-bottom: 15px; }
+
+        /* 默寫雲朵方塊 */
+        .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin-top: 20px; }
+        .word-tile { 
+            aspect-ratio: 1/1; background: white; border: 3px solid var(--cinna-blue); border-radius: 20px;
+            display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        /* 隱藏字體，改用雲朵圖標 */
+        .word-tile .char { color: transparent; font-size: 2rem; }
+        .word-tile::before { content: '☁️'; position: absolute; font-size: 1.8rem; }
         
-        .ghost-btn { background: var(--cinna-pink); color: white; border: none; padding: 20px; border-radius: 20px; font-weight: 900; font-size: 1.5rem; width: 100%; box-shadow: 0 5px 0 #f06292; }
-        .audio-hint-btn { background: #e1f5fe; color: #0288d1; border: none; padding: 12px; border-radius: 12px; width: 100%; margin-bottom: 15px; font-weight: bold; }
+        /* 寫完後的狀態 */
+        .word-tile.completed .char { color: #5d5d5d; }
+        .word-tile.completed::before { content: ''; }
+        .word-tile.completed { border-color: var(--cinna-pink); background: #fffaff; }
+        .word-tile.completed::after { content: '🧁'; position: absolute; top: -10px; right: -10px; font-size: 1.2rem; }
+
+        /* 彈窗練習 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        #writer-canvas { border: 2px solid #eee; border-radius: 20px; width: 300px; height: 300px; margin: 20px 0; }
+        .action-btn { width: 85%; padding: 18px; border-radius: 20px; font-weight: bold; border: none; font-size: 1.2rem; margin-bottom: 10px; }
+        .audio-btn { background: #e1f5fe; color: #0288d1; }
+        .quiz-btn { background: var(--cinna-pink); color: white; box-shadow: 0 5px 0 #f48fb1; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <img src="https://img.icons8.com/color/144/cinnamoroll.png" class="chibi-img">
-        <h3 style="margin:5px 0; color: #546e7a;">玉桂狗：聽一聽，寫一寫！</h3>
+        <div class="hero-img"></div>
+        <h3 style="margin:5px 0; color: #78909c;">玉桂狗聽默教室</h3>
     </div>
 
-    <div class="input-section" id="input-container">
-        <input type="text" id="dictation-input" placeholder="請先輸入或錄製全句..." onblur="hideInput()" onfocus="showInput()" />
-        <button onclick="confirmText()" style="background:var(--cinna-blue); color:white; border:none; padding:10px 20px; border-radius:10px; margin-top:10px; font-weight:bold;">完成輸入</button>
+    <div class="input-panel" id="input-ui">
+        <input type="text" id="dictation-input" placeholder="錄入/語音輸入默寫句子..." />
+        <div style="display:flex; gap:10px;">
+            <button onclick="startMission()" style="flex:2; background:var(--cinna-blue); color:white; border:none; padding:12px; border-radius:12px; font-weight:bold;">🚀 開始默寫挑戰</button>
+            <button id="voice-btn" style="flex:1; background:#eee; border:none; border-radius:12px;">🎤 語音</button>
+        </div>
     </div>
 
-    <button class="play-all-btn" onclick="sayFullSentence()">🔊 播放整句朗讀 (廣東話)</button>
-    <p style="font-size: 0.8rem; color: #aaa;">點擊下方雲朵開始「聽音默寫」</p>
-
-    <div class="word-grid" id="tiles"></div>
+    <div id="exercise-ui" class="hidden-mode">
+        <button class="play-all-btn" onclick="sayFull()">🔊 聽全句朗讀 (廣東話)</button>
+        <div class="word-grid" id="tile-grid"></div>
+        <button onclick="editMode()" style="margin-top:30px; background:none; border:none; color:#aaa; text-decoration:underline;">修改句子</button>
+    </div>
 
     <div id="modal" class="modal">
-        <div class="modal-box">
-            <button class="audio-hint-btn" onclick="sayChar()">🔊 聽讀音</button>
-            <div id="writer-canvas"></div>
-            <button class="ghost-btn" onclick="startGhost()">🧠 挑戰默寫</button>
-            <button onclick="closeModal()" style="background:none; border:none; color:#aaa; margin-top:20px;">[ 返回 ]</button>
-        </div>
+        <button class="action-btn audio-btn" onclick="sayChar()">🔊 聽字音</button>
+        <div id="writer-canvas"></div>
+        <button class="action-btn quiz-btn" onclick="goQuiz()">✍️ 開始默寫</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:#bbb; margin-top:10px;">返回</button>
     </div>
 
     <script>
@@ -74,40 +84,51 @@
         let activeChar = '';
         let activeTile = null;
 
-        function confirmText() {
+        // 語音輸入
+        const Speech = window.webkitSpeechRecognition || window.SpeechRecognition;
+        if (Speech) {
+            const rec = new Speech();
+            rec.lang = 'zh-HK';
+            document.getElementById('voice-btn').onclick = () => { rec.start(); };
+            rec.onresult = (e) => { document.getElementById('dictation-input').value = e.results[0][0].transcript; };
+        }
+
+        function startMission() {
             const text = document.getElementById('dictation-input').value;
-            if(!text) return;
+            if(!text) return alert("請先輸入文字");
+            document.getElementById('input-ui').classList.add('hidden-mode');
+            document.getElementById('exercise-ui').classList.remove('hidden-mode');
             render(text);
-            hideInput();
+        }
+
+        function editMode() {
+            document.getElementById('input-ui').classList.remove('hidden-mode');
+            document.getElementById('exercise-ui').classList.add('hidden-mode');
         }
 
         function render(text) {
-            const container = document.getElementById('tiles');
-            container.innerHTML = '';
+            const grid = document.getElementById('tile-grid');
+            grid.innerHTML = '';
             text.split('').forEach(char => {
-                if (/[，。！？、\s]/.test(char)) {
-                    const s = document.createElement('div');
-                    s.style.cssText = "font-size:1.5rem; line-height:60px; color:#ddd;";
-                    s.innerText = char;
-                    container.appendChild(s);
-                    return;
-                }
                 const tile = document.createElement('div');
                 tile.className = 'word-tile';
-                tile.innerText = char;
-                tile.onclick = () => openModal(char, tile);
-                container.appendChild(tile);
+                if (/[，。！？、\s]/.test(char)) {
+                    tile.style.border = "none";
+                    tile.style.background = "none";
+                    tile.style.boxShadow = "none";
+                    tile.innerHTML = `<span style="color:#ccc; font-size:1.5rem;">${char}</span>`;
+                    tile.classList.add('completed');
+                } else {
+                    tile.innerHTML = `<span class="char">${char}</span>`;
+                    tile.onclick = () => openModal(char, tile);
+                }
+                grid.appendChild(tile);
             });
         }
 
-        function hideInput() { document.getElementById('input-container').classList.add('hidden'); }
-        function showInput() { document.getElementById('input-container').classList.remove('hidden'); }
-
-        function sayFullSentence() {
-            const text = document.getElementById('dictation-input').value;
-            const u = new SpeechSynthesisUtterance(text);
-            u.lang = 'zh-HK';
-            u.rate = 0.7; // 慢速朗讀
+        function sayFull() {
+            const u = new SpeechSynthesisUtterance(document.getElementById('dictation-input').value);
+            u.lang = 'zh-HK'; u.rate = 0.7;
             window.speechSynthesis.speak(u);
         }
 
@@ -121,16 +142,14 @@
             activeChar = char; activeTile = tile;
             document.getElementById('modal').style.display = 'flex';
             document.getElementById('writer-canvas').innerHTML = '';
-            // 彈窗內預設不顯示正確答案
             writer = HanziWriter.create('writer-canvas', char, {
-                width: 280, height: 280, padding: 20,
-                strokeColor: '#555', radicalColor: '#ffc1e3', drawingWidth: 30, 
-                showOutline: false // 這裡關閉輪廓，徹底考驗記憶
+                width: 300, height: 300, padding: 20,
+                strokeColor: '#444', radicalColor: '#ffc1e3', drawingWidth: 30, showOutline: false
             });
-            sayChar(); // 進入時自動讀音
+            sayChar();
         }
 
-        function startGhost() {
+        function goQuiz() {
             writer.quiz({ onComplete: () => { activeTile.classList.add('completed'); setTimeout(closeModal, 800); } });
         }
 
