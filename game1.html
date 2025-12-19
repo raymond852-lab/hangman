@@ -3,173 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>玉桂狗聽默挑戰</title>
+    <title>玉桂狗聽默特訓</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <style>
         :root { --cinna-blue: #b3e5fc; --cinna-pink: #ffc1e3; --bg: #f9feff; }
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; text-align: center; }
-
-        .header { background: white; border-radius: 25px; padding: 15px; border: 3px solid var(--cinna-blue); margin-bottom: 15px; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; text-align: center; overflow: hidden; }
         
-        /* 使用 Base64 內嵌圖片，確保永不破圖 */
-        .hero-img { 
-            width: 100px; height: 100px; 
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="60" r="35" fill="white" stroke="%23b3e5fc" stroke-width="2"/><ellipse cx="20" cy="50" rx="15" ry="10" fill="white" stroke="%23b3e5fc" stroke-width="2"/><ellipse cx="80" cy="50" rx="15" ry="10" fill="white" stroke="%23b3e5fc" stroke-width="2"/><circle cx="40" cy="55" r="3" fill="%235d5d5d"/><circle cx="60" cy="55" r="3" fill="%235d5d5d"/><path d="M 45 65 Q 50 70 55 65" fill="none" stroke="%23ffc1e3" stroke-width="2"/></svg>') no-repeat center;
-            background-size: contain; margin: 0 auto;
-        }
-
-        .mode-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .mode-btn { flex: 1; padding: 15px; border-radius: 15px; border: 2px solid var(--cinna-blue); background: white; font-weight: bold; }
-        .mode-btn.active { background: var(--cinna-blue); color: white; }
+        .header { background: white; border-radius: 20px; padding: 10px; border: 3px solid var(--cinna-blue); margin-bottom: 10px; }
+        .hero-img { width: 80px; height: 80px; margin: 0 auto; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,50 Q20,30 50,30 T80,50 T50,70 T20,50' fill='%23fff' stroke='%23b3e5fc' stroke-width='3'/%3E%3Ccircle cx='40' cy='48' r='3' fill='%235d5d5d'/%3E%3Ccircle cx='60' cy='48' r='3' fill='%235d5d5d'/%3E%3Cpath d='M45,58 Q50,62 55,58' stroke='%23ffc1e3' fill='none' stroke-width='2'/%3E%3Cpath d='M10,45 Q5,35 15,30 Q25,25 30,40' fill='%23fff' stroke='%23b3e5fc' stroke-width='2'/%3E%3Cpath d='M90,45 Q95,35 85,30 Q75,25 70,40' fill='%23fff' stroke='%23b3e5fc' stroke-width='2'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; }
 
         .input-panel { background: white; border-radius: 20px; padding: 20px; border: 2px dashed var(--cinna-blue); }
-        #dictation-input { width: 100%; border: none; font-size: 1.3rem; padding: 10px; text-align: center; border-bottom: 2px solid var(--cinna-blue); margin-bottom: 15px; outline: none; }
-        .start-btn { background: var(--cinna-pink); color: white; border: none; padding: 18px; border-radius: 50px; font-weight: 900; font-size: 1.4rem; width: 100%; box-shadow: 0 5px 0 #f48fb1; cursor: pointer; }
+        #dictation-input { width: 100%; border: none; font-size: 1.4rem; border-bottom: 2px solid var(--cinna-blue); margin-bottom: 20px; outline: none; text-align: center; padding: 10px 0; }
+        .start-btn { background: var(--cinna-pink); color: white; border: none; padding: 18px; border-radius: 50px; font-weight: 900; font-size: 1.5rem; width: 100%; box-shadow: 0 5px 0 #f06292; cursor: pointer; }
 
-        .hidden-mode { display: none; }
-        .play-all-btn { background: #81d4fa; color: white; border: none; padding: 20px; border-radius: 50px; font-weight: 900; font-size: 1.3rem; width: 100%; margin-bottom: 25px; box-shadow: 0 5px 0 #4fc3f7; }
+        .word-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+        .word-tile { width: 60px; height: 60px; background: white; border: 3px solid var(--cinna-blue); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #546e7a; position: relative; }
+        .tile-hide { visibility: hidden; }
+        .word-tile.done { border-color: var(--cinna-pink); background: #fff0f5; visibility: visible !important; }
 
-        .word-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 100px; }
-        .word-tile { width: 65px; height: 65px; background: white; border: 3px solid var(--cinna-blue); border-radius: 18px; display: flex; align-items: center; justify-content: center; position: relative; }
-        .tile-invisible { visibility: hidden; }
-
-        .word-tile .char { font-size: 2.2rem; color: #546e7a; }
-        .word-tile.completed { border-color: var(--cinna-pink); background: #fffaff; visibility: visible !important; }
-        .word-tile.completed::after { content: '🧁'; position: absolute; top: -10px; right: -10px; font-size: 1.2rem; }
-
+        /* 全螢幕練習視窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        #writer-canvas { border: 4px solid #f0f0f0; border-radius: 25px; width: 320px; height: 320px; margin: 15px 0; background: #fff; }
-        
-        .action-btn { width: 85%; padding: 18px; border-radius: 20px; font-weight: bold; border: none; font-size: 1.3rem; margin-bottom: 10px; cursor: pointer; }
-        .audio-btn { background: #e1f5fe; color: #0288d1; border: 2px solid #b3e5fc; }
-        .quiz-btn { background: var(--cinna-pink); color: white; box-shadow: 0 6px 0 #f06292; font-size: 1.5rem; }
+        #writer-canvas { border: 5px solid #f0faff; border-radius: 30px; width: 340px; height: 340px; margin: 20px 0; background: #fff; cursor: crosshair; }
+        .hint-text { color: var(--cinna-blue); font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; }
+        .speaker-icon { font-size: 3rem; margin-bottom: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="hero-img"></div>
-        <h3 style="margin:5px 0; color: #78909c;">玉桂狗默寫特訓</h3>
-    </div>
-
     <div id="setup-ui">
-        <div class="mode-selector">
-            <button class="mode-btn active" id="m1-btn" onclick="selectLevel(1)">Level 1 (雲朵提示)</button>
-            <button class="mode-btn" id="m2-btn" onclick="selectLevel(2)">Level 2 (全盲默)</button>
+        <div class="header">
+            <div class="hero-img"></div>
+            <h3 style="margin:5px 0; color: #78909c;">玉桂狗：Level 2 全自動默寫</h3>
         </div>
         <div class="input-panel">
-            <input type="text" id="dictation-input" placeholder="錄入默寫句子..." />
-            <button class="start-btn" onclick="startChallenge()">🚀 開始默寫挑戰</button>
+            <input type="text" id="dictation-input" placeholder="請輸入默寫句子..." />
+            <button class="start-btn" onclick="startFlow()">🚀 直接開始挑戰</button>
         </div>
     </div>
 
-    <div id="challenge-ui" class="hidden-mode">
-        <button class="play-all-btn" onclick="sayFull()">🔊 聽全句朗讀 (廣東話)</button>
-        <div class="word-grid" id="tile-grid"></div>
-        <button onclick="location.reload()" style="margin-top:50px; background:none; border:none; color:#bbb; text-decoration:underline;">返回重新錄入</button>
+    <div id="practice-ui" style="display:none;">
+        <div class="word-grid" id="grid"></div>
+        <button onclick="location.reload()" style="margin-top:50px; border:none; background:none; color:#ccc; text-decoration:underline; font-size:1rem;">停止並返回</button>
     </div>
 
     <div id="modal" class="modal">
-        <div style="font-size: 1rem; color: #b3e5fc; font-weight: bold;">請默寫第 <span id="char-idx">1</span> 個字</div>
+        <div class="speaker-icon" onclick="sayWord()">🐶🔊</div>
+        <div class="hint-text">請聽音默寫</div>
         <div id="writer-canvas"></div>
-        <button class="action-btn audio-btn" onclick="sayChar()">🔊 聽讀音</button>
-        <button class="action-btn quiz-btn" onclick="goQuiz()">✍️ 我準備好默寫了</button>
+        <div style="color:#ddd; font-size:0.9rem;">寫完正確筆劃會自動跳到下一個字</div>
     </div>
 
     <script>
-        let currentLevel = 1;
+        let chars = [];
+        let activeIdx = 0;
         let writer = null;
-        let activeChar = '';
-        let currentIndex = 0;
-        let allChars = [];
 
-        function selectLevel(l) {
-            currentLevel = l;
-            document.getElementById('m1-btn').classList.toggle('active', l===1);
-            document.getElementById('m2-btn').classList.toggle('active', l===2);
-        }
-
-        function startChallenge() {
-            const text = document.getElementById('dictation-input').value.trim();
-            if(!text) return;
-            allChars = text.split('');
-            document.getElementById('setup-ui').classList.add('hidden-mode');
-            document.getElementById('challenge-ui').classList.remove('hidden-mode');
+        function startFlow() {
+            const val = document.getElementById('dictation-input').value.trim();
+            if(!val) return;
+            chars = val.split('');
+            document.getElementById('setup-ui').style.display = 'none';
+            document.getElementById('practice-ui').style.display = 'block';
             
-            renderGrid();
-            if(currentLevel === 2) { currentIndex = 0; autoNextLvl2(); }
-        }
-
-        function renderGrid() {
-            const grid = document.getElementById('tile-grid');
-            grid.innerHTML = '';
-            allChars.forEach((char, i) => {
-                const tile = document.createElement('div');
-                tile.className = 'word-tile';
-                tile.id = `tile-${i}`;
-                if (/[，。！？、\s]/.test(char)) {
-                    tile.innerHTML = `<span class="char" style="color:#ddd">${char}</span>`;
-                    tile.style.border = "none";
-                } else {
-                    tile.innerHTML = `<span class="char">${char}</span>`;
-                    if(currentLevel === 1) {
-                        const cloud = document.createElement('div');
-                        cloud.innerText = '☁️';
-                        cloud.style.cssText = 'position:absolute; background:white; width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:15px;';
-                        tile.appendChild(cloud);
-                        tile.onclick = () => openModal(char, i);
-                    } else {
-                        tile.classList.add('tile-invisible');
-                    }
-                }
-                grid.appendChild(tile);
+            // 初始化底層格子
+            const g = document.getElementById('grid'); g.innerHTML = '';
+            chars.forEach((c, i) => {
+                const d = document.createElement('div');
+                d.className = 'word-tile tile-hide';
+                d.id = 't-' + i;
+                if(/[，。！？、\s]/.test(c)) { d.innerHTML = c; d.style.border = 'none'; d.classList.add('done'); }
+                g.appendChild(d);
             });
+
+            activeIdx = 0;
+            nextStep();
         }
 
-        function autoNextLvl2() {
-            while(currentIndex < allChars.length && /[，。！？、\s]/.test(allChars[currentIndex])) currentIndex++;
-            if(currentIndex < allChars.length) openModal(allChars[currentIndex], currentIndex);
-            else alert("🍬 恭喜！全句默寫完成！");
+        function nextStep() {
+            // 跳過標點符號
+            while(activeIdx < chars.length && /[，。！？、\s]/.test(chars[activeIdx])) {
+                activeIdx++;
+            }
+
+            if(activeIdx < chars.length) {
+                runQuiz(chars[activeIdx], activeIdx);
+            } else {
+                document.getElementById('modal').style.display = 'none';
+                alert("🍭 太棒了！全部寫完喇！");
+            }
         }
 
-        function openModal(char, index) {
-            activeChar = char; currentIndex = index;
+        function runQuiz(char, index) {
             document.getElementById('modal').style.display = 'flex';
             document.getElementById('writer-canvas').innerHTML = '';
-            document.getElementById('char-idx').innerText = index + 1;
             
+            // 建立寫字對象
             writer = HanziWriter.create('writer-canvas', char, {
-                width: 320, height: 320, padding: 30,
-                showOutline: false, showCharacter: false, // 絕對白紙模式
-                drawingWidth: 35, strokeColor: '#444'
+                width: 340,
+                height: 340,
+                padding: 30,
+                showOutline: false,    // 絕對不顯示輪廓
+                showCharacter: false,  // 絕對不顯示答案
+                strokeColor: '#5d5d5d',
+                drawingWidth: 35,
+                drawingColor: '#333'
             });
-            sayChar();
-        }
 
-        function goQuiz() {
+            // 1. 自動朗讀
+            setTimeout(() => { sayWord(); }, 300);
+
+            // 2. 自動啟動默寫模式 (不需要按按鈕)
             writer.quiz({
-                onComplete: () => {
-                    const tile = document.getElementById(`tile-${currentIndex}`);
-                    tile.classList.add('completed');
-                    if (tile.querySelector('div')) tile.querySelector('div').remove();
+                onComplete: function() {
+                    // 寫完後更新底層格子
+                    const tile = document.getElementById('t-' + index);
+                    tile.innerHTML = char;
+                    tile.classList.add('done');
+                    
+                    // 3. 自動跳到下一個字
                     setTimeout(() => {
-                        document.getElementById('modal').style.display = 'none';
-                        if(currentLevel === 2) { currentIndex++; autoNextLvl2(); }
-                    }, 800);
+                        activeIdx++;
+                        nextStep();
+                    }, 600);
                 }
             });
         }
 
-        function sayFull() {
-            const u = new SpeechSynthesisUtterance(allChars.join(''));
-            u.lang = 'zh-HK'; u.rate = 0.7;
+        function sayWord() {
+            const u = new SpeechSynthesisUtterance(chars[activeIdx]);
+            u.lang = 'zh-HK';
+            u.rate = 0.8;
             window.speechSynthesis.speak(u);
-        }
-
-        function sayChar() {
-            const u = new SpeechSynthesisUtterance(activeChar);
-            u.lang = 'zh-HK'; window.speechSynthesis.speak(u);
         }
     </script>
 </body>
